@@ -1,4 +1,4 @@
-module github.com/tkdeng/goutil
+module git.tkdeng.com/goutil
 
 go 1.22.5
 
