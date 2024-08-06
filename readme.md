@@ -1,6 +1,6 @@
 # GoUtil
 
-Common Utility Functions For Golang.
+Utility functions for go.
 
 ## Installation
 
