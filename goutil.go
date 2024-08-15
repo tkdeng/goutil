@@ -83,7 +83,7 @@ func TrimTabs(size uint8, buf []byte, tabSize ...uint8) []byte {
 	}
 
 	buf = regex.Comp(`^\r?\n`).RepStrLit(buf, []byte{})
-	buf = regex.Comp(`(?m)^(\t|\s{`+t+`}){1,`+strconv.FormatUint(uint64(size), 10)+`}`).RepStrLit(buf, []byte{})
+	buf = regex.Comp(`(?m)^(\t|[ ]{`+t+`}){1,`+strconv.FormatUint(uint64(size), 10)+`}`).RepStrLit(buf, []byte{})
 
 	return buf
 }
