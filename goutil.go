@@ -1,6 +1,11 @@
 package goutil
 
-import "errors"
+import (
+	"errors"
+	"strconv"
+
+	"github.com/AspieSoft/go-regex-re2/v2"
+)
 
 // Contains returns true if an array contains a value
 func Contains[T any](search []T, value T) bool {
@@ -62,4 +67,23 @@ func ContainsMapKey[T Hashable, J any](search map[T]J, key T) bool {
 
 	_, ok := search[key]
 	return ok
+}
+
+// TrimTabs trims exxess beginning tab characters from a multiline string
+//
+// @size: number of tabs to trim
+func TrimTabs(size uint8, buf []byte, tabSize ...uint8) []byte {
+	if size == 0 {
+		size = 1
+	}
+
+	t := "2"
+	if len(tabSize) != 0 {
+		t = strconv.FormatUint(uint64(tabSize[0]), 10)
+	}
+
+	buf = regex.Comp(`^\r?\n`).RepStrLit(buf, []byte{})
+	buf = regex.Comp(`(?m)^(\t|\s{`+t+`}){1,`+strconv.FormatUint(uint64(size), 10)+`}`).RepStrLit(buf, []byte{})
+
+	return buf
 }
