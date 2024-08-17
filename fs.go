@@ -30,6 +30,21 @@ func JoinPath(path ...string) (string, error) {
 	return resPath, nil
 }
 
+// AppendRoot will append a root path to a list of paths
+func AppendRoot(root string, paths ...*string) error {
+	var err error
+
+	for _, path := range paths {
+		p, e := JoinPath(root, *path)
+		if e != nil {
+			err = errors.Join(err, e)
+		}
+		*path = p
+	}
+
+	return err
+}
+
 // Copy lets you copy files from the src to the dst
 func CopyFile(src, dst string) (int64, error) {
 	sourceFileStat, err := os.Stat(src)

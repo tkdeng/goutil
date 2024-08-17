@@ -132,3 +132,47 @@ func MapArgs(args ...[]string) map[string]string {
 
 	return argMap
 }
+
+// ArgsReader is a structured way to read os.args
+//
+// Note: you should call `args.New()` to get a populated list of arguments
+type ArgsReader struct {
+	args    map[string]string
+	nextInt int
+}
+
+// ReadArgs returns a list of `os.args` in a structured ArgsReader
+func ReadArgs(args ...[]string) ArgsReader {
+	return ArgsReader{
+		args:    MapArgs(args...),
+		nextInt: 0,
+	}
+}
+
+// Get returns a key value from os.args
+//
+// @def: default value if no arg is found
+//
+// @name: the name of the argument to search for
+//
+// @alt: optional list of fallback names to search for
+//   - note: if you pass an empty value or `*` into @alt,
+//     it will assume the next integer arg that has not been returned yet.
+func (args *ArgsReader) Get(def string, name string, alt ...string) string {
+	if val, ok := args.args[name]; ok {
+		return val
+	}
+
+	for _, n := range alt {
+		if n == "" || n == "*" {
+			if val, ok := args.args[strconv.Itoa(args.nextInt)]; ok {
+				args.nextInt++
+				return val
+			}
+		} else if val, ok := args.args[n]; ok {
+			return val
+		}
+	}
+
+	return def
+}

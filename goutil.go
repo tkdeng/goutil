@@ -110,3 +110,10 @@ func CloneBytes(b []byte) []byte {
 	copy(buf, b)
 	return buf
 }
+
+// Swap will swap the values of 2 variables
+func Swap[T any](val1 *T, val2 *T) {
+	v := *val1
+	*val1 = *val2
+	*val2 = v
+}
