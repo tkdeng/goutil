@@ -1,6 +1,8 @@
 package goutil
 
-import "testing"
+import (
+	"testing"
+)
 
 func Test(t *testing.T) {
 	
