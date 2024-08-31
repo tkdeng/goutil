@@ -7,7 +7,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/AspieSoft/go-regex-re2/v2"
+	"github.com/tkdeng/goregex"
 )
 
 // SysFreeMemory returns the amount of memory available in megabytes

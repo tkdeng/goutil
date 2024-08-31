@@ -3,7 +3,7 @@ package goutil
 import (
 	"bytes"
 
-	"github.com/AspieSoft/go-regex-re2/v2"
+	"github.com/tkdeng/goregex"
 )
 
 type encodeHtml struct{}

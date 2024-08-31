@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/AspieSoft/go-regex-re2/v2"
+	"github.com/tkdeng/goregex"
 )
 
 // RandBytes generates random bytes using crypto/rand

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/AspieSoft/go-regex-re2/v2"
+	"github.com/tkdeng/goregex"
 )
 
 // Contains returns true if an array contains a value
