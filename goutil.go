@@ -70,6 +70,32 @@ func ContainsMapKey[T Hashable, J any](search map[T]J, key T) bool {
 	return ok
 }
 
+// JoinMap merges 2 or more maps to the dest map
+//
+// This method will also try to search for nested map values
+// of the same key type, and append to array values if possible.
+func JoinMap[T Hashable](dest *map[T]any, m ...*map[T]any) {
+	for _, ml := range m {
+		for key, val := range *ml {
+			if v, ok := val.(map[T]any); ok {
+				if n, ok := (*dest)[key].(map[T]any); ok {
+					JoinMap(&n, &v)
+					(*dest)[key] = n
+					continue
+				}
+			} else if v, ok := val.([]any); ok {
+				if n, ok := (*dest)[key].([]any); ok {
+					n = append(n, v)
+					(*dest)[key] = n
+					continue
+				}
+			}
+
+			(*dest)[key] = val
+		}
+	}
+}
+
 // TrimTabs trims exxess beginning tab characters from a multiline string
 //
 // @size: number of tabs to trim
