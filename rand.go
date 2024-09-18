@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/tkdeng/goregex"
+	regex "github.com/tkdeng/goregex"
 )
 
 // RandBytes generates random bytes using crypto/rand
@@ -102,9 +102,10 @@ func URandBytes(size uint, unique ...*[][]byte) []byte {
 			time.Sleep(1 * time.Microsecond)
 			return URandBytes(size, unique[0])
 		}
+
+		*unique[0] = append(*unique[0], b)
 	}
 
-	*unique[0] = append(*unique[0], b)
 	return b
 }
 
