@@ -14,7 +14,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// JoinPath joins multiple file types with safety from backtracking
+// JoinPath joins multiple file paths with safety from backtracking
 func JoinPath(root string, path ...string) (string, error) {
 	resPath, err := filepath.Abs(string(root))
 	if err != nil {
