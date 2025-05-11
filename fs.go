@@ -10,23 +10,25 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/tkdeng/goregex"
+	regex "github.com/tkdeng/goregex"
 	"gopkg.in/yaml.v3"
 )
 
 // JoinPath joins multiple file types with safety from backtracking
-func JoinPath(path ...string) (string, error) {
-	resPath, err := filepath.Abs(string(path[0]))
+func JoinPath(root string, path ...string) (string, error) {
+	resPath, err := filepath.Abs(string(root))
 	if err != nil {
 		return "", err
 	}
-	for i := 1; i < len(path); i++ {
-		p := filepath.Join(resPath, string(path[i]))
+
+	for _, p := range path {
+		p = filepath.Join(resPath, string(p))
 		if p == resPath || !strings.HasPrefix(p, resPath) {
 			return "", errors.New("path leaked outside of root")
 		}
 		resPath = p
 	}
+
 	return resPath, nil
 }
 
