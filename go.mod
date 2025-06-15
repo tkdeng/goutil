@@ -5,12 +5,11 @@ go 1.22.6
 require (
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/shirou/gopsutil v2.21.11+incompatible
-	github.com/tkdeng/goregex v0.0.1
+	github.com/tkdeng/regex v1.0.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	github.com/GRbit/go-pcre v1.0.1 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.14 // indirect

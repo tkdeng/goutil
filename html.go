@@ -3,7 +3,7 @@ package goutil
 import (
 	"bytes"
 
-	"github.com/tkdeng/goregex"
+	"github.com/tkdeng/regex"
 )
 
 type encodeHtml struct{}
@@ -25,7 +25,7 @@ func (encHtml *encodeHtml) Escape(html []byte) []byte {
 		}
 		return []byte("&amp;")
 	})
-	return regEscFixAmp.RepStrLit(html, []byte("&amp;"))
+	return regEscFixAmp.RepLit(html, []byte("&amp;"))
 }
 
 var regEscHTMLArgs *regex.Regexp = regex.Comp(`([\\]*)([\\"'\'])`)

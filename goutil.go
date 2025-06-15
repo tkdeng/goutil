@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	regex "github.com/tkdeng/goregex"
+	"github.com/tkdeng/regex"
 )
 
 // Contains returns true if an array contains a value
@@ -109,8 +109,8 @@ func TrimTabs(size uint8, buf []byte, tabSize ...uint8) []byte {
 		t = strconv.FormatUint(uint64(tabSize[0]), 10)
 	}
 
-	buf = regex.Comp(`^\r?\n`).RepStrLit(buf, []byte{})
-	buf = regex.Comp(`(?m)^(\t|[ ]{`+t+`}){1,`+strconv.FormatUint(uint64(size), 10)+`}`).RepStrLit(buf, []byte{})
+	buf = regex.Comp(`^\r?\n`).RepLit(buf, []byte{})
+	buf = regex.Comp(`(?m)^(\t|[ ]{`+t+`}){1,`+strconv.FormatUint(uint64(size), 10)+`}`).RepLit(buf, []byte{})
 
 	return buf
 }

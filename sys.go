@@ -7,7 +7,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/tkdeng/goregex"
+	"github.com/tkdeng/regex"
 )
 
 // SysFreeMemory returns the amount of memory available in megabytes

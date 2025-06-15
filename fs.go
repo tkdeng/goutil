@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	regex "github.com/tkdeng/goregex"
+	"github.com/tkdeng/regex"
 	"gopkg.in/yaml.v3"
 )
 

@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	regex "github.com/tkdeng/goregex"
+	"github.com/tkdeng/regex"
 )
 
 // RandBytes generates random bytes using crypto/rand
@@ -28,15 +28,15 @@ func RandBytes(size uint, exclude ...[]byte) []byte {
 
 	if len(exclude) >= 2 {
 		if exclude[0] == nil || len(exclude[0]) == 0 {
-			b = regex.Comp(`[^\w_-]`).RepStrLit(b, exclude[1])
+			b = regex.Comp(`[^\w_-]`).RepLit(b, exclude[1])
 		} else {
-			b = regex.Comp(`[`+regex.Escape(string(exclude[0]))+`]`).RepStrLit(b, exclude[1])
+			b = regex.Comp(`[`+regex.Escape(string(exclude[0]))+`]`).RepLit(b, exclude[1])
 		}
 	} else if len(exclude) >= 1 {
 		if exclude[0] == nil || len(exclude[0]) == 0 {
-			b = regex.Comp(`[^\w_-]`).RepStrLit(b, []byte{})
+			b = regex.Comp(`[^\w_-]`).RepLit(b, []byte{})
 		} else {
-			b = regex.Comp(`[`+regex.Escape(string(exclude[0]))+`]`).RepStrLit(b, []byte{})
+			b = regex.Comp(`[`+regex.Escape(string(exclude[0]))+`]`).RepLit(b, []byte{})
 		}
 	}
 
@@ -47,15 +47,15 @@ func RandBytes(size uint, exclude ...[]byte) []byte {
 
 		if len(exclude) >= 2 {
 			if exclude[0] == nil || len(exclude[0]) == 0 {
-				a = regex.Comp(`[^\w_-]`).RepStrLit(a, exclude[1])
+				a = regex.Comp(`[^\w_-]`).RepLit(a, exclude[1])
 			} else {
-				a = regex.Comp(`[`+regex.Escape(string(exclude[0]))+`]`).RepStrLit(a, exclude[1])
+				a = regex.Comp(`[`+regex.Escape(string(exclude[0]))+`]`).RepLit(a, exclude[1])
 			}
 		} else if len(exclude) >= 1 {
 			if exclude[0] == nil || len(exclude[0]) == 0 {
-				a = regex.Comp(`[^\w_-]`).RepStrLit(a, []byte{})
+				a = regex.Comp(`[^\w_-]`).RepLit(a, []byte{})
 			} else {
-				a = regex.Comp(`[`+regex.Escape(string(exclude[0]))+`]`).RepStrLit(a, []byte{})
+				a = regex.Comp(`[`+regex.Escape(string(exclude[0]))+`]`).RepLit(a, []byte{})
 			}
 		}
 
