@@ -80,6 +80,8 @@ func (fw *FSWatcher) WatchDir(root string, nosub ...bool) error {
 	*fw.size++
 	fw.mu.Unlock()
 
+	lastRun := NewCache[string, int64](10 * time.Second)
+
 	go func() {
 		defer watcher.Close()
 		for {
@@ -89,6 +91,15 @@ func (fw *FSWatcher) WatchDir(root string, nosub ...bool) error {
 
 			if event, ok := <-watcher.Events; ok {
 				filePath := event.Name
+
+				// prevent duplicate runs
+				now := time.Now().UnixMilli()
+				if last, err := lastRun.Get(filePath); err == nil {
+					if now-last < 100 {
+						continue
+					}
+				}
+				lastRun.Set(filePath, now, nil)
 
 				stat, err := os.Stat(filePath)
 				if err != nil {
