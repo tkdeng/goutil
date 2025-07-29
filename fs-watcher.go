@@ -101,24 +101,29 @@ func (fw *FSWatcher) WatchDir(root string, nosub ...bool) error {
 				}
 				lastRun.Set(filePath, now, nil)
 
-				stat, err := os.Stat(filePath)
-				if err != nil {
-					if fw.OnRemove == nil || fw.OnRemove(filePath, event.Op.String()) {
-						watcher.Remove(filePath)
-					}
-				} else if stat.IsDir() {
-					if fw.OnDirAdd == nil || fw.OnDirAdd(filePath, event.Op.String()) {
-						watcher.Add(filePath)
-					}
-				} else {
-					if fw.OnFileChange != nil {
-						fw.OnFileChange(filePath, event.Op.String())
-					}
-				}
+				go func(filePath string, op string) {
+					time.Sleep(100 * time.Millisecond)
 
-				if fw.OnAny != nil {
-					fw.OnAny(filePath, event.Op.String())
-				}
+					stat, err := os.Stat(filePath)
+					if err != nil {
+						if fw.OnRemove == nil || fw.OnRemove(filePath, op) {
+							watcher.Remove(filePath)
+						}
+					} else if stat.IsDir() {
+						if fw.OnDirAdd == nil || fw.OnDirAdd(filePath, op) {
+							watcher.Add(filePath)
+						}
+					} else {
+						if fw.OnFileChange != nil {
+							fw.OnFileChange(filePath, op)
+						}
+					}
+
+					if fw.OnAny != nil {
+						fw.OnAny(filePath, op)
+					}
+				}(filePath, event.Op.String())
+
 			}
 		}
 	}()
