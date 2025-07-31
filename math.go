@@ -1,7 +1,5 @@
 package goutil
 
-import "math"
-
 // Degree is an integer that rotates 360 degrees.
 //
 // This method behaves similar to uint8, in how adding anything above 255 will rotate back to 0,
@@ -28,6 +26,39 @@ func Deg(deg int16) *Degree {
 
 // clamp rotates anything above 360 back to 0, and anything below 0 back to 360
 func (d *Degree) clamp() {
+	if d.min == d.max {
+		d.deg = d.min
+		return
+	}
+
+	// handle edge range
+	if d.min > d.max {
+		// normalize to 360 max
+		for d.deg < 0 {
+			d.deg += 360
+		}
+		for d.deg >= 360 {
+			d.deg -= 360
+		}
+		if d.deg < 0 {
+			d.deg = 0
+		}
+
+		// adjust within range
+		for d.deg < d.min && d.deg > d.max {
+			if d.deg < d.min && d.deg > d.max {
+				d.deg = d.deg - d.min + d.max
+			}
+
+			if d.deg < 0 {
+				d.deg += 360
+			}
+		}
+
+		return
+	}
+
+	// handle normal range
 	d.deg -= d.min
 
 	for d.deg < 0 {
@@ -44,7 +75,10 @@ func (d *Degree) clamp() {
 }
 
 func (d *Degree) SetClamp(min, max int16) {
-	if min > max {
+	Clamp(&min, 0, 360)
+	Clamp(&max, 0, 360)
+
+	if min == 360 && max == 0 {
 		min, max = max, min
 	}
 
@@ -91,9 +125,8 @@ func (d *Degree) Distance(deg *Degree) int16 {
 		n = d1 - d2
 	}
 
-	r := int16(math.Max(float64(d.max-d.min), float64(deg.max-deg.min)))
-	d1 = Deg(d1 + (r / 2)).Get()
-	d2 = Deg(d2 + (r / 2)).Get()
+	d1 = Deg(d1 + (360 / 2)).Get()
+	d2 = Deg(d2 + (360 / 2)).Get()
 
 	if d1 < d2 && d2-d1 < n {
 		return d2 - d1
@@ -102,4 +135,13 @@ func (d *Degree) Distance(deg *Degree) int16 {
 	}
 
 	return n
+}
+
+// Clamp updates a number to fit a min and max value
+func Clamp[T Number](n *T, min T, max T) {
+	if *n < min {
+		*n = min
+	} else if *n > max {
+		*n = max
+	}
 }
