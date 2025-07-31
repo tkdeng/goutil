@@ -89,8 +89,8 @@ func (d *Degree) Distance(deg *Degree) int16 {
 		n = d1 - d2
 	}
 
-	d1 = Deg(d1 + (360 / 2)).Get()
-	d2 = Deg(d2 + (360 / 2)).Get()
+	d1 = Deg(d1 + ((d.max - d.min) / 2)).Get()
+	d2 = Deg(d2 + ((d.max - d.min) / 2)).Get()
 
 	if d1 < d2 && d2-d1 < n {
 		return d2 - d1
