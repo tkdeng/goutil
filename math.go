@@ -1,5 +1,7 @@
 package goutil
 
+import "math"
+
 // Degree is an integer that rotates 360 degrees.
 //
 // This method behaves similar to uint8, in how adding anything above 255 will rotate back to 0,
@@ -89,8 +91,9 @@ func (d *Degree) Distance(deg *Degree) int16 {
 		n = d1 - d2
 	}
 
-	d1 = Deg(d1 + ((d.max - d.min) / 2)).Get()
-	d2 = Deg(d2 + ((d.max - d.min) / 2)).Get()
+	r := int16(math.Max(float64(d.max-d.min), float64(deg.max-deg.min)))
+	d1 = Deg(d1 + (r / 2)).Get()
+	d2 = Deg(d2 + (r / 2)).Get()
 
 	if d1 < d2 && d2-d1 < n {
 		return d2 - d1
