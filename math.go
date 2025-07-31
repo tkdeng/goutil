@@ -6,6 +6,8 @@ package goutil
 // but instead it will rotate from 360 to 0 (359 max).
 type Degree struct {
 	deg int16
+	min int16
+	max int16
 }
 
 // Deg creates a new Degree integer that rotates 360 degrees.
@@ -13,22 +15,41 @@ type Degree struct {
 // This method behaves similar to uint8, in how adding anything above 255 will rotate back to 0,
 // but instead it will rotate from 360 to 0 (359 max).
 func Deg(deg int16) *Degree {
-	d := Degree{deg}
+	d := Degree{
+		deg: deg,
+		min: 0,
+		max: 360,
+	}
 	d.clamp()
 	return &d
 }
 
 // clamp rotates anything above 360 back to 0, and anything below 0 back to 360
 func (d *Degree) clamp() {
+	d.deg -= d.min
+
 	for d.deg < 0 {
-		d.deg += 360
+		d.deg += d.max - d.min
 	}
-	for d.deg >= 360 {
-		d.deg -= 360
+	for d.deg >= d.max-d.min {
+		d.deg -= d.max - d.min
 	}
 	if d.deg < 0 {
 		d.deg = 0
 	}
+
+	d.deg += d.min
+}
+
+func (d *Degree) SetClamp(min, max int16) {
+	if min > max {
+		min, max = max, min
+	}
+
+	d.min = min
+	d.max = max
+
+	d.clamp()
 }
 
 // Get rotation value
