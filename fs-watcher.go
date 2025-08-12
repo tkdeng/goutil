@@ -18,7 +18,6 @@ type FSWatcher struct {
 	watcherList *map[string]*watcherObj
 	mu          sync.Mutex
 	size        *uint
-	config      FSWatcherConfig
 
 	eventCB []func(path string, event string, op string, isDir bool)
 
@@ -55,33 +54,17 @@ type FSWatcher struct {
 	OnAny func(path string, op string)
 }
 
-// FSWatcherConfig is the configuration for the FileWatcher
-type FSWatcherConfig struct {
-	// Init will run all On methods when the watcher starts
-	Init bool
-}
-
 type watcherObj struct {
 	watcher *fsnotify.Watcher
 	close   *bool
 }
 
 // FileWatcher creates a new file watcher
-func FileWatcher(config ...FSWatcherConfig) *FSWatcher {
-	var cfg FSWatcherConfig
-	if len(config) > 0 {
-		cfg = config[0]
-	} else {
-		cfg = FSWatcherConfig{
-			Init: false,
-		}
-	}
-
+func FileWatcher() *FSWatcher {
 	size := uint(0)
 	return &FSWatcher{
 		watcherList: &map[string]*watcherObj{},
 		size:        &size,
-		config:      cfg,
 	}
 }
 
@@ -99,9 +82,7 @@ func (fw *FSWatcher) WatchDir(root string, nosub ...bool) error {
 		return err
 	}
 
-	if fw.config.Init {
-		fw.initDir(root)
-	}
+	fw.initDir(root)
 
 	runClose := false
 
