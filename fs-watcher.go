@@ -9,11 +9,18 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
+const FSEVENT_ADD = "add"
+const FSEVENT_MODIFY = "modify"
+const FSEVENT_REMOVE = "remove"
+
 // A watcher instance for the `FS.FSWatcher` method
 type FSWatcher struct {
 	watcherList *map[string]*watcherObj
 	mu          sync.Mutex
 	size        *uint
+	config      FSWatcherConfig
+
+	eventCB []func(path string, event string, op string, isDir bool)
 
 	// when a file changes
 	//
@@ -48,15 +55,34 @@ type FSWatcher struct {
 	OnAny func(path string, op string)
 }
 
+// FSWatcherConfig is the configuration for the FileWatcher
+type FSWatcherConfig struct {
+	// Init will run all On methods when the watcher starts
+	Init bool
+}
+
 type watcherObj struct {
 	watcher *fsnotify.Watcher
 	close   *bool
 }
 
 // FileWatcher creates a new file watcher
-func FileWatcher() *FSWatcher {
+func FileWatcher(config ...FSWatcherConfig) *FSWatcher {
+	var cfg FSWatcherConfig
+	if len(config) > 0 {
+		cfg = config[0]
+	} else {
+		cfg = FSWatcherConfig{
+			Init: false,
+		}
+	}
+
 	size := uint(0)
-	return &FSWatcher{watcherList: &map[string]*watcherObj{}, size: &size}
+	return &FSWatcher{
+		watcherList: &map[string]*watcherObj{},
+		size:        &size,
+		config:      cfg,
+	}
 }
 
 // WatchDir watches the files in a directory and its subdirectories for changes
@@ -71,6 +97,10 @@ func (fw *FSWatcher) WatchDir(root string, nosub ...bool) error {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return err
+	}
+
+	if fw.config.Init {
+		fw.initDir(root)
 	}
 
 	runClose := false
@@ -105,11 +135,14 @@ func (fw *FSWatcher) WatchDir(root string, nosub ...bool) error {
 					time.Sleep(100 * time.Millisecond)
 
 					stat, err := os.Stat(filePath)
+					event := FSEVENT_MODIFY
 					if err != nil {
+						event = FSEVENT_REMOVE
 						if fw.OnRemove == nil || fw.OnRemove(filePath, op) {
 							watcher.Remove(filePath)
 						}
 					} else if stat.IsDir() {
+						event = FSEVENT_ADD
 						if fw.OnDirAdd == nil || fw.OnDirAdd(filePath, op) {
 							watcher.Add(filePath)
 						}
@@ -122,8 +155,11 @@ func (fw *FSWatcher) WatchDir(root string, nosub ...bool) error {
 					if fw.OnAny != nil {
 						fw.OnAny(filePath, op)
 					}
-				}(filePath, event.Op.String())
 
+					for _, cb := range fw.eventCB {
+						cb(filePath, event, op, err == nil && stat.IsDir())
+					}
+				}(filePath, event.Op.String())
 			}
 		}
 	}()
@@ -138,6 +174,26 @@ func (fw *FSWatcher) WatchDir(root string, nosub ...bool) error {
 	}
 
 	return nil
+}
+
+func (fw *FSWatcher) initDir(dir string) {
+	if files, err := os.ReadDir(dir); err == nil {
+		for _, file := range files {
+			if path, err := JoinPath(dir, file.Name()); err == nil {
+				if !file.IsDir() {
+					for _, cb := range fw.eventCB {
+						cb(path, FSEVENT_ADD, "init", false)
+					}
+				} else {
+					for _, cb := range fw.eventCB {
+						cb(path, FSEVENT_ADD, "init", true)
+					}
+
+					fw.initDir(path)
+				}
+			}
+		}
+	}
 }
 
 func (fw *FSWatcher) watchDirSub(watcher *fsnotify.Watcher, dir string) {
@@ -190,4 +246,9 @@ func (fw *FSWatcher) Wait() {
 	for *fw.size != 0 {
 		time.Sleep(100 * time.Millisecond)
 	}
+}
+
+// On adds a new callback to be run when a file or directory changes
+func (fw *FSWatcher) On(cb func(path string, event string, op string, isDir bool)) {
+	fw.eventCB = append(fw.eventCB, cb)
 }
