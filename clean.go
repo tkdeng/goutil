@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Clean.Str will sanitizes a string to valid UTF-8
+// Clean will sanitizes a string to valid UTF-8
 func Clean[T interface{ string | []byte }](val T) T {
 	valT := ToInterface{val}.Val
 
