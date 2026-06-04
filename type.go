@@ -42,6 +42,8 @@ func toString[T interface{ string | []byte }](val any) T {
 		return T(strconv.Itoa(val.(int)))
 	case int64:
 		return T(strconv.Itoa(int(val.(int64))))
+	case int32:
+		return T(strconv.Itoa(int(val.(int32))))
 	case int16:
 		return T([]byte{byte(val.(int16))})
 	case int8:
@@ -60,8 +62,6 @@ func toString[T interface{ string | []byte }](val any) T {
 		return T(strconv.FormatFloat(val.(float64), 'f', -1, 64))
 	case float32:
 		return T(strconv.FormatFloat(float64(val.(float32)), 'f', -1, 32))
-	case rune:
-		return T([]byte{byte(val.(rune))})
 	case []interface{}:
 		b := make([]byte, len(val.([]interface{})))
 		for i, v := range val.([]interface{}) {
@@ -77,6 +77,12 @@ func toString[T interface{ string | []byte }](val any) T {
 	case []int64:
 		b := make([]byte, len(val.([]int64)))
 		for i, v := range val.([]int64) {
+			b[i] = byte(v)
+		}
+		return T(b)
+	case []int32:
+		b := make([]byte, len(val.([]int32)))
+		for i, v := range val.([]int32) {
 			b[i] = byte(v)
 		}
 		return T(b)
@@ -134,12 +140,6 @@ func toString[T interface{ string | []byte }](val any) T {
 			b = append(b, v...)
 		}
 		return T(b)
-	case []rune:
-		b := []byte{}
-		for _, v := range val.([]rune) {
-			b = append(b, byte(v))
-		}
-		return T(b)
 	default:
 		return T("")
 	}
@@ -193,6 +193,8 @@ func toNumber[T interface {
 		return T(val.(int8))
 	case int16:
 		return T(val.(int16))
+	case int32:
+		return T(val.(int32))
 	case uint:
 		return T(val.(uint))
 	case uint16:
@@ -203,11 +205,6 @@ func toNumber[T interface {
 		return T(val.(uint64))
 	case uintptr:
 		return T(val.(uintptr))
-	case rune:
-		if i, err := strconv.Atoi(string(val.(rune))); err == nil {
-			return T(i)
-		}
-		return 0
 	default:
 		return 0
 	}
@@ -237,11 +234,6 @@ func ToType[T SupportedType](val any) T {
 			return ToInterface{b[0]}.Val.(T)
 		}
 		return ToInterface{byte(0)}.Val.(T)
-	case rune:
-		if b := toString[[]byte](val); len(b) != 0 {
-			return ToInterface{rune(b[0])}.Val.(T)
-		}
-		return ToInterface{rune(0)}.Val.(T)
 	case bool:
 		return ToInterface{!IsZeroOfUnderlyingType(val)}.Val.(T)
 
@@ -250,6 +242,10 @@ func ToType[T SupportedType](val any) T {
 		return ToInterface{toNumber[int](val)}.Val.(T)
 	case int64:
 		return ToInterface{toNumber[int64](val)}.Val.(T)
+	case int32:
+		return ToInterface{toNumber[int32](val)}.Val.(T)
+	case int16:
+		return ToInterface{toNumber[int16](val)}.Val.(T)
 	case int8:
 		return ToInterface{toNumber[int8](val)}.Val.(T)
 
