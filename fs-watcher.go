@@ -112,8 +112,8 @@ func (fw *FSWatcher) WatchDir(root string, nosub ...bool) error {
 				}
 				lastRun.Set(filePath, now, nil)
 
-				go func(filePath string, op string) {
-					time.Sleep(100 * time.Millisecond)
+				func(filePath string, op string) {
+					time.Sleep(10 * time.Microsecond)
 
 					stat, err := os.Stat(filePath)
 					event := FSEVENT_MODIFY
